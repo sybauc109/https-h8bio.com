@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#101c30" />
+  <title>AnModz Bio — Signing Apps</title>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <script src="https://defensebarefoot.com/f1/cb/45/f1cb4579c463de3188819b5128554416.js"></script>
+
+  <style>
+    /* ===== WELCOME OVERLAY STYLES ===== */
+    #welcome-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      background-color: #000000;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* Hiệu ứng chuyển cảnh mờ dần trong 2s */
+      transition: opacity 2s ease, visibility 2s ease;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #welcome-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Khung chứa với viền tím phát sáng */
+    .welcome-card {
+      padding: 40px 50px;
+      border-radius: 16px;
+      border: 2px solid #a855f7;
+      background: rgba(0, 0, 0, 0.85);
+      /* Cụm tím sáng bao quanh viền */
+      box-shadow: 0 0 15px #a855f7, 0 0 30px #9333ea, inset 0 0 15px rgba(168, 85, 247, 0.5);
+      text-align: center;
+      animation: pulseGlow 2.5s infinite alternate;
+    }
+
+    /* Dòng chữ Welcome to bio ánh sáng */
+    .welcome-text {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      /* Ánh sáng kim/Shimmer bằng dải màu gradient động */
+      background: linear-gradient(
+        110deg,
+        #ffffff 0%,
+        #e9d5ff 25%,
+        #ffffff 50%,
+        #c084fc 75%,
+        #ffffff 100%
+      );
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: shineText 3s linear infinite, textGlow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes shineText {
+      to {
+        background-position: 200% center;
+      }
+    }
+
+    @keyframes textGlow {
+      from {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(168, 85, 247, 0.5);
+      }
+      to {
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.9), 0 0 35px rgba(168, 85, 247, 0.9);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 15px #a855f7, 0 0 25px #9333ea, inset 0 0 10px rgba(168, 85, 247, 0.4);
+      }
+      100% {
+        box-shadow: 0 0 25px #c084fc, 0 0 45px #a855f7, inset 0 0 20px rgba(192, 132, 252, 0.7);
+      }
+    }
+
+    :root {
+      color-scheme: light;
+      --navy: #101c30;
+      --navy-light: #192a43;
+      --ink: #18253a;
+      --muted: #58667a;
+      --blue: #225bc5;
+      --blue-hover: #19499f;
+      --blue-pale: #edf3ff;
+      --line: #dee4ed;
+      --surface: #f5f7fa;
+      --white: #fff;
+      --radius-card: 10px;
+      --radius-icon: 22%;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --page-width: 900px;
+      --gutter: 32px;
+      --top-h: 80px;
+      --nav-h: calc(78px + env(safe-area-inset-bottom));
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { min-height: 100%; scroll-padding-top: calc(var(--top-h) + env(safe-area-inset-top) + 20px); }
+    body {
+      margin: 0; min-height: 100vh; min-height: 100dvh;
+      background: var(--surface); color: var(--ink);
+      font: 1rem/1.65 var(--font); -webkit-font-smoothing: antialiased;
+      -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+    }
+    button, input, textarea { font: inherit; }
+    a, button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    a { color: var(--blue); text-underline-offset: 4px; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 3px solid #377af0; outline-offset: 4px; }
+    ::selection { background: #d4e3ff; color: var(--navy); }
+    .space { display: none; }
+
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+      min-height: calc(var(--top-h) + env(safe-area-inset-top));
+      padding: env(safe-area-inset-top) max(var(--gutter), env(safe-area-inset-right)) 0 max(var(--gutter), env(safe-area-inset-left));
+      display: flex; align-items: center; background: var(--white);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner { width: 100%; max-width: 1160px; margin-inline: auto; display: flex; align-items: center; min-height: var(--top-h); }
+    .brand {
+      display: inline-flex; align-items: center; gap: 11px;
+      color: var(--navy); font-size: 1.125rem; line-height: 1.3;
+      font-weight: 700; letter-spacing: -.035em; text-decoration: none;
+    }
+    .brand-mark { display: block; flex: none; width: 33px; height: 33px; border-radius: var(--radius-icon); overflow: hidden; }
+    .brand-mark img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .page {
+      min-height: 100vh; min-height: 100dvh;
+      padding-top: calc(var(--top-h) + env(safe-area-inset-top));
+      padding-bottom: calc(var(--nav-h) + 20px);
+    }
+    .view { display: none; }
+    .view.active { display: block; }
+    .head {
+      padding: 32px max(var(--gutter), calc((100% - var(--page-width)) / 2)) 35px;
+      color: var(--white); background: var(--navy);
+    }
+    .head .kicker { margin: 0 0 12px; color: #a9c1e7; font-size: .75rem; font-weight: 650; letter-spacing: .11em; line-height: 1.5; text-transform: uppercase; }
+    .kicker .dot { display: none; }
+    .head h1 { margin: 0 0 12px; color: var(--white); font-size: clamp(2rem, 5vw, 2.65rem); font-weight: 650; letter-spacing: -.035em; line-height: 1.15; overflow-wrap: anywhere; }
+    .head h1 .accent { color: inherit; }
+    .head > p:not(.kicker) { margin: 0; max-width: 650px; color: #c1ccdc; font-size: 1rem; line-height: 1.7; }
+
+    .list { width: calc(100% - var(--gutter) * 2); max-width: var(--page-width); margin: 0 auto; padding: 28px 0; display: flex; flex-direction: column; gap: 12px; }
+    .app-card, .skel {
+      display: grid; grid-template-columns: 60px minmax(0, 1fr) auto;
+      align-items: center; gap: 18px; padding: 20px 22px;
+      border: 1px solid var(--line); border-radius: var(--radius-card);
+      background: var(--white); min-width: 0;
+    }
+    .app-card { transition: border-color .15s ease; }
+    .app-card.featured { border-color: #b6caed; }
+    .app-ic {
+      position: relative; display: grid; place-items: center;
+      width: 60px; height: 60px; overflow: hidden; border-radius: var(--radius-icon);
+      background: var(--blue-pale); color: var(--blue);
+      font-size: 1.5rem; font-weight: 650; line-height: 1;
+      box-shadow: inset 0 0 0 1px #18253a0d;
+    }
+    .app-ic img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+    .app-ic .scan { display: none; }
+    .app-meta { min-width: 0; }
+    .app-name { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 0 6px; color: var(--ink); font-size: 1.0625rem; font-weight: 650; letter-spacing: -.015em; line-height: 1.45; overflow-wrap: anywhere; }
+    .badge { display: inline-block; padding: 2px 7px; color: var(--blue); background: var(--blue-pale); border: 1px solid #d7e3fc; border-radius: 4px; font-size: .75rem; font-weight: 550; letter-spacing: 0; line-height: 1.5; }
+    .app-cert { display: flex; align-items: flex-start; gap: 6px; min-width: 0; max-width: 100%; color: var(--muted); font-size: .875rem; line-height: 1.55; }
+    .app-cert svg { display: block; flex: none; width: 15px; height: 15px; margin-top: 3px; }
+    .app-cert .cert-lbl { flex: none; }
+    .app-cert .cert-val { min-width: 0; overflow-wrap: anywhere; }
+    .get {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-width: 94px; min-height: 44px; padding: 10px 15px;
+      color: var(--white); background: var(--blue); border: 1px solid transparent;
+      border-radius: 6px; font-size: .875rem; font-weight: 600; line-height: 1.35;
+      text-decoration: none; cursor: pointer; transition: background-color .15s ease;
+    }
+    .get svg { display: block; flex: none; width: 17px; height: 17px; }
+    .get:active { background: var(--blue-hover); }
+    .state { width: calc(100% - var(--gutter) * 2); max-width: var(--page-width); margin: 28px auto; padding: 44px 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; color: var(--muted); background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-card); }
+    .state p { margin: 0; font-size: 1rem; line-height: 1.7; overflow-wrap: anywhere; }
+    .state-icon { color: var(--blue); }
+    .state-icon svg { display: block; width: 32px; height: 32px; }
+    .retry { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 20px; border-radius: 6px; background: var(--white); border: 1px solid #cbd4e1; color: var(--ink); font-size: .9375rem; line-height: 1.35; font-weight: 600; }
+    .retry svg { display: block; flex: none; }
+
+    .skel { position: relative; overflow: hidden; }
+    .sk-ic { width: 60px; height: 60px; border-radius: var(--radius-icon); background: #e9edf4; }
+    .sk-lines { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+    .sk-line { height: 12px; border-radius: 4px; background: #e9edf4; }
+    .sk-line.w1 { width: 48%; }
+    .sk-line.w2 { width: 80%; }
+    .sk-line.w3 { width: 35%; }
+    .sk-btn { width: 94px; height: 44px; border-radius: 6px; background: #e9edf4; }
+    .skel::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent, #ffffffa6, transparent); transform: translateX(-100%); animation: shimmer 1.6s ease-in-out infinite; }
+    @keyframes shimmer { to { transform: translateX(100%); } }
+
+    .seg-wrap { width: calc(100% - var(--gutter) * 2); max-width: var(--page-width); margin: 24px auto 0; }
+    .seg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; padding: 5px; border: 1px solid var(--line); border-radius: 8px; background: var(--white); }
+    .seg__thumb { display: none; }
+    .seg__btn { min-width: 0; min-height: 44px; padding: 10px 8px; color: var(--muted); background: transparent; border: 1px solid transparent; border-radius: 5px; font-size: .875rem; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; transition: color .15s, background-color .15s; }
+    .seg__btn--active { color: var(--white); background: var(--blue); }
+
+    .nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+      min-height: var(--nav-h);
+      padding: 6px max(8px, calc((100% - var(--page-width)) / 2)) calc(6px + env(safe-area-inset-bottom));
+      display: flex; align-items: stretch; background: var(--white);
+      border-top: 1px solid var(--line); box-shadow: 0 -2px 12px #101c3005;
+    }
+    .nav__item { display: flex; flex: 1 1 0; min-width: 0; min-height: 65px; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 8px 3px; color: var(--muted); background: transparent; border: 0; border-radius: 7px; font-size: .875rem; line-height: 1.3; font-weight: 500; transition: color .15s, background-color .15s; }
+    .nav__item > span { max-width: 100%; overflow-wrap: anywhere; }
+    .nav__icon { display: grid; place-items: center; width: 22px; height: 22px; flex: none; }
+    .nav__icon svg { display: block; width: 100%; height: 100%; stroke: currentColor; }
+    .nav__item--active { color: var(--blue); background: var(--blue-pale); font-weight: 600; }
+    .nav__item:focus-visible { outline-offset: -3px; }
+    .no-script { width: calc(100% - var(--gutter) * 2); max-width: var(--page-width); margin: 32px auto; color: var(--muted); }
+
+    @media (hover: hover) {
+      .app-card:hover { border-color: #bcc9dc; }
+      .get:hover { background: var(--blue-hover); }
+      .retry:hover { background: var(--surface); border-color: #9baabe; }
+      .seg__btn:not(.seg__btn--active):hover, .nav__item:not(.nav__item--active):hover { background: var(--surface); color: var(--ink); }
+    }
+    @media (max-width: 800px) {
+      :root { --gutter: 20px; --top-h: 72px; }
+      .head { padding-top: 28px; padding-bottom: 29px; }
+      .list { padding-top: 22px; }
+      .app-card, .skel { padding: 18px; gap: 14px; }
+    }
+    @media (max-width: 520px) {
+      :root { --gutter: 16px; }
+      .head { padding-top: 24px; padding-bottom: 26px; }
+      .head h1 { font-size: 2rem; }
+      .app-card, .skel { grid-template-columns: 52px minmax(0, 1fr) auto; padding: 16px; gap: 12px; }
+      .app-ic, .sk-ic { width: 52px; height: 52px; }
+      .get { min-width: 82px; padding-inline: 12px; gap: 6px; }
+      .get svg { width: 15px; height: 15px; }
+      .sk-btn { width: 82px; }
+      .seg { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .seg__btn { font-size: .9375rem; }
+      .nav__item { font-size: .75rem; }
+    }
+    @media (max-width: 400px) {
+      .app-card, .skel { grid-template-columns: 48px minmax(0, 1fr); align-items: start; column-gap: 13px; row-gap: 12px; }
+      .app-ic, .sk-ic { width: 48px; height: 48px; }
+      .get, .sk-btn { grid-column: 2; justify-self: start; }
+      .sk-lines { padding-top: 4px; }
+      .app-cert svg { display: none; }
+      .app-name { font-size: 1rem; }
+      .nav { padding-inline: max(6px, env(safe-area-inset-left)); }
+      .nav__item { padding-inline: 2px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .skel::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- WELCOME SCREEN -->
+  <div id="welcome-screen">
+    <div class="welcome-card">
+      <h1 class="welcome-text">WELCOME TO BIO</h1>
+    </div>
+  </div>
+
+  <div class="space" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#" onclick="return false;" aria-label="AnModz Bio">
+        <span class="brand-mark" aria-hidden="true"><img src="https://cdn.phototourl.com/free/2026-09-12-a7b36b59-39d8-47b4-a9e4-c39a2ba158fd.jpg" alt="" width="33" height="33" decoding="async"></span>
+        AnModz Bio
+      </a>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- views injected by JS -->
+    <noscript><p class="no-script">Enable JavaScript to load the app downloads.</p></noscript>
+  </main>
+
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <button class="nav__item nav__item--active" data-tab="esign" aria-current="page">
+      <span class="nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+        <path d="M16.5 4.5l3 3L8 19H5v-3L16.5 4.5z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg></span>
+      <span>ESign</span>
+    </button>
+    <button class="nav__item" data-tab="scarlet">
+      <span class="nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+        <path d="M12 21s-7-4.6-9.3-9.3C1.3 8.5 3 5 6.2 5c2 0 3.2 1.2 3.8 2.4C10.6 6.2 11.8 5 13.8 5 17 5 18.7 8.5 21.3 11.7 19 16.4 12 21 12 21z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg></span>
+      <span>Scarlet</span>
+    </button>
+    <button class="nav__item" data-tab="ksign">
+      <span class="nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+        <circle cx="8" cy="15" r="4"/><path d="M11 13l8-8M16 5h4v4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg></span>
+      <span>KSign</span>
+    </button>
+    <button class="nav__item" data-tab="feather">
+      <span class="nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+        <path d="M20 4C9 4 4 11 4 17v3h3c6 0 13-5 13-16z" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 20L12 12M9 13h4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg></span>
+      <span>Feather</span>
+    </button>
+    <button class="nav__item" data-tab="others">
+      <span class="nav__icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+        <rect x="4" y="4" width="6.4" height="6.4" rx="1.6"/>
+        <rect x="13.6" y="4" width="6.4" height="6.4" rx="1.6"/>
+        <rect x="4" y="13.6" width="6.4" height="6.4" rx="1.6"/>
+        <rect x="13.6" y="13.6" width="6.4" height="6.4" rx="1.6"/>
+      </svg></span>
+      <span>Others</span>
+    </button>
+  </nav>
+
+  <script>
+    /* ===== WELCOME OVERLAY JS ===== */
+    window.addEventListener('DOMContentLoaded', function() {
+      // Hiển thị chữ welcome 1 giây, sau đó kích hoạt mờ dần trong 2 giây rồi vào trang web
+      setTimeout(function() {
+        var welcomeEl = document.getElementById('welcome-screen');
+        if (welcomeEl) {
+          welcomeEl.classList.add('fade-out');
+        }
+      }, 1000);
+    });
+
+    /* ===== tab config ===== */
+    var TABS = {
+      esign:         { title:'ESign',         sub:'Choose an ESign build to install on your device.', ic:'ic-esign',        glyph:'E' },
+      scarlet:       { title:'Scarlet',       sub:'Choose a Scarlet build to install on your device.',      ic:'ic-scarlet',       glyph:'S' },
+      ksign:         { title:'KSign',         sub:'Choose a KSign build to install on your device.',                  ic:'ic-ksign',         glyph:'K' },
+      feather:       { title:'Feather',       sub:'Choose a Feather build to install on your device.',                          ic:'ic-feather',       glyph:'F' },
+      asspp:         { title:'Asspp',         sub:'Choose an Asspp build to install on your device.',      ic:'ic-asspp',         glyph:'A' },
+      sideinstaller: { title:'SideInstaller', sub:'Choose a SideInstaller build to install on your device.',                           ic:'ic-sideinstaller', glyph:'S' },
+      trollstore:    { title:'TrollStore',    sub:'Choose a TrollStore build and check its device requirements before installing.',                                        ic:'ic-trollstore',    glyph:'T' },
+      dopamine:      { title:'Dopamine',      sub:'Choose a Dopamine build and check its device requirements before installing.',                                        ic:'ic-dopamine',      glyph:'D' }
+    };
+    /* top-level bottom-nav tabs. 'others' is a special view with its own segmented picker. */
+    var TAB_ORDER = ['esign','scarlet','ksign','feather','others'];
+    /* sources shown inside the Others tab; each maps to json/<key>.json */
+    var OTHERS_SEGMENTS = ['asspp','sideinstaller','trollstore', 'dopamine'];
+    var othersActive = OTHERS_SEGMENTS[0];   // currently-selected segment
+
+    var loaded = {};    // dataKey -> true once fetched OK
+    var loading = {};   // dataKey -> true while in flight
+    var dataCache = {}; // dataKey -> rendered list/empty HTML (for instant repaint)
+
+    /* ===== icons ===== */
+    var DL   = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    var CERT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9"/></svg>';
+
+    function escapeHtml(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    function attr(s){ return String(s==null?'':s).replace(/"/g,'&quot;'); }
+
+    /* strip Apple cert prefixes like "iPhone Distribution: " and trailing " (TEAMID)" */
+    function cleanCertName(s){
+      s = String(s==null?'':s);
+      s = s.replace(/^\s*(?:iPhone|Apple|iOS|Mac)\s+(?:Distribution|Development|Developer)\s*:\s*/i, '');
+      s = s.replace(/\s*\([A-Za-z0-9]{6,}\)\s*$/, '');
+      return s.trim();
+    }
+
+    /* read a field by trying several possible key names */
+    function pick(obj, keys, fallback){
+      for(var i=0;i<keys.length;i++){
+        if(obj[keys[i]] !== undefined && obj[keys[i]] !== null && obj[keys[i]] !== '') return obj[keys[i]];
+      }
+      return fallback;
+    }
+
+    /* base origin for absolute manifest URLs (itms-services needs an absolute url) */
+    var SITE_ORIGIN = (location.origin && location.origin.indexOf('http') === 0)
+      ? location.origin : 'https://skibiditech.co';
+
+    /* normalise one raw record into the shape the card needs */
+    function normalize(raw, tabKey){
+      var t = TABS[tabKey];
+      var bundleID = pick(raw, ['bundleID','bundleId','bid','bundle'], '');
+      var certID   = pick(raw, ['certID','certId','id'], '');
+      var name     = pick(raw, ['name','title','app','appName'], t.title);
+      var manifestURL = SITE_ORIGIN + '/manifest.php?bid=' + encodeURIComponent(bundleID)
+                      + '&certID=' + encodeURIComponent(certID)
+                      + '&name='   + encodeURIComponent(name);
+      var installLink = 'itms-services://?action=download-manifest&url=' + encodeURIComponent(manifestURL);
+      return {
+        name:     name,
+        cert:     cleanCertName(pick(raw, ['certName','cert','certificate','certificateName','signer'], '')),
+        bundleID: bundleID,
+        certID:   certID,
+        featured: !!pick(raw, ['featured','isFeatured','pinned'], false),
+        icon:     bundleID ? ('img/'+bundleID+'.png') : '',
+        link:     installLink
+      };
+    }
+
+    /* accept array, or object wrapping an array under a common key */
+    function extractList(data){
+      if(Array.isArray(data)) return data;
+      if(data && typeof data === 'object'){
+        var keys = ['apps','data','items','list','results','signers'];
+        for(var i=0;i<keys.length;i++){ if(Array.isArray(data[keys[i]])) return data[keys[i]]; }
+      }
+      return [];
+    }
+
+    function cardHtml(app, tabKey){
+      var t = TABS[tabKey];
+      var iconInner = app.icon
+        ? '<img src="'+attr(app.icon)+'" alt="" loading="lazy" onerror="this.remove()">'
+        : escapeHtml(t.glyph);
+
+      var feat   = app.featured ? ' featured' : '';
+      var badge  = app.featured ? '<span class="badge">Featured</span>' : '';
+
+      var certLine = app.cert
+        ? '<div class="app-cert" title="'+attr(app.cert)+'">'+CERT+'<span class="cert-lbl">Cert:</span><span class="cert-val">'+escapeHtml(app.cert)+'</span></div>'
+        : '';
+
+      return ''+
+        '<div class="app-card'+feat+'" role="listitem">'+
+          '<div class="app-ic '+t.ic+'">'+iconInner+'<span class="scan"></span></div>'+
+          '<div class="app-meta">'+
+            '<p class="app-name">'+escapeHtml(app.name)+badge+'</p>'+
+            certLine+
+          '</div>'+
+          '<button class="get" type="button" data-install="'+attr(app.link)+'">'+DL+'<span>Install</span></button>'+
+        '</div>';
+    }
+
+    function skeletonHtml(){
+      var one = '<div class="skel"><div class="sk-ic"></div><div class="sk-lines"><div class="sk-line w1"></div><div class="sk-line w2"></div><div class="sk-line w3"></div></div><div class="sk-btn"></div></div>';
+      return '<div class="list">'+one+one+one+'</div>';
+    }
+
+    function errorHtml(tabKey, msg){
+      return ''+
+        '<div class="state">'+
+          '<span class="state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 8v5M12 16.5h.01" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg></span>'+
+          '<p>'+escapeHtml(msg||'Could not load apps')+'</p>'+
+          '<button class="retry" data-retry="'+tabKey+'">'+
+            '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 2.6-6.4M3 4v4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+            'Retry</button>'+
+        '</div>';
+    }
+
+    function emptyHtml(){
+      return ''+
+        '<div class="state">'+
+          '<span class="state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round"/></svg></span>'+
+          '<p>No apps available</p>'+
+        '</div>';
+    }
+
+    /* turn a fetched payload into the rendered card list (featured floats to top) */
+    function buildListHtml(data, dataKey){
+      var list = extractList(data).map(function(r){ return normalize(r, dataKey); });
+      list = list.map(function(a,i){ return {a:a,i:i}; })
+                 .sort(function(x,y){
+                   var f = (y.a.featured?1:0) - (x.a.featured?1:0);
+                   return f !== 0 ? f : x.i - y.i;
+                 })
+                 .map(function(o){ return o.a; });
+      if(!list.length) return emptyHtml();
+      var cards = list.map(function(a){ return cardHtml(a, dataKey); }).join('');
+      return '<div class="list" role="list">'+cards+'</div>';
+    }
+
+    /* which DOM container a data source paints into */
+    function containerFor(dataKey){
+      return OTHERS_SEGMENTS.indexOf(dataKey) !== -1 ? 'body-others' : 'body-'+dataKey;
+    }
+    /* the shared Others body must only be painted by the segment that's currently active */
+    function stillRelevant(dataKey, containerId){
+      return containerId !== 'body-others' || othersActive === dataKey;
+    }
+
+    /* ===== fetch a source (json/<dataKey>.json) into a container, with auto cache-clear ===== */
+    function loadData(dataKey, containerId, force){
+      var body = document.getElementById(containerId);
+      if(!body) return;
+
+      if(loaded[dataKey] && !force && dataCache[dataKey] != null){
+        body.innerHTML = dataCache[dataKey];
+        return;
+      }
+      if(loading[dataKey]){ body.innerHTML = skeletonHtml(); return; }
+
+      loading[dataKey] = true;
+      body.innerHTML = skeletonHtml();
+
+      var url = 'json/'+dataKey+'.json?v='+Date.now()+'-'+Math.random().toString(36).slice(2);
+
+      fetch(url, { cache:'no-store', headers:{ 'Cache-Control':'no-cache, no-store, must-revalidate', 'Pragma':'no-cache' } })
+        .then(function(res){
+          if(!res.ok) throw new Error('HTTP '+res.status);
+          return res.json();
+        })
+        .then(function(data){
+          var html = buildListHtml(data, dataKey);
+          dataCache[dataKey] = html;
+          loaded[dataKey] = true;
+          if(stillRelevant(dataKey, containerId)){
+            var el = document.getElementById(containerId);
+            if(el) el.innerHTML = html;
+          }
+        })
+        .catch(function(err){
+          var title = (TABS[dataKey] && TABS[dataKey].title) ? TABS[dataKey].title : dataKey;
+          if(stillRelevant(dataKey, containerId)){
+            var el = document.getElementById(containerId);
+            if(el) el.innerHTML = errorHtml(dataKey, 'Could not load '+title+' ('+err.message+')');
+          }
+        })
+        .then(function(){ loading[dataKey] = false; });
+    }
+
+    function reload(dataKey, force){ loadData(dataKey, containerFor(dataKey), force); }
+
+    function othersViewHtml(){
+      var segBtns = OTHERS_SEGMENTS.map(function(k, i){
+        var t = TABS[k] || { title:k };
+        return '<button class="seg__btn'+(i===0?' seg__btn--active':'')+'" type="button" role="tab" '+
+               'aria-selected="'+(i===0?'true':'false')+'" data-seg="'+attr(k)+'">'+escapeHtml(t.title)+'</button>';
+      }).join('');
+      var firstSub = (TABS[OTHERS_SEGMENTS[0]] && TABS[OTHERS_SEGMENTS[0]].sub) || '';
+      return ''+
+        '<section class="view" id="view-others" data-view="others">'+
+          '<div class="head">'+
+            '<p class="kicker">App downloads</p>'+
+            '<h1><span class="accent">Others</span></h1>'+
+            '<p id="others-sub">'+escapeHtml(firstSub)+'</p>'+
+          '</div>'+
+          '<div class="seg-wrap">'+
+            '<div class="seg" data-others role="tablist" aria-label="Other signing sources">'+
+              '<span class="seg__thumb" aria-hidden="true"></span>'+
+              segBtns+
+            '</div>'+
+          '</div>'+
+          '<div id="body-others"></div>'+
+        '</section>';
+    }
+
+    (function buildViews(){
+      var main = document.querySelector('.page');
+      var html = '';
+      TAB_ORDER.forEach(function(key){
+        if(key === 'others'){ html += othersViewHtml(); return; }
+        var t = TABS[key];
+        html += ''+
+          '<section class="view'+(key==='esign'?' active':'')+'" id="view-'+key+'" data-view="'+key+'">'+
+            '<div class="head">'+
+              '<p class="kicker">App downloads</p>'+
+              '<h1><span class="accent">'+escapeHtml(t.title)+'</span></h1>'+
+              '<p>'+escapeHtml(t.sub)+'</p>'+
+            '</div>'+
+            '<div id="body-'+key+'"></div>'+
+          '</section>';
+      });
+      main.insertAdjacentHTML('beforeend', html);
+      reload('esign');
+    })();
+
+    var segThumbReady = false;
+    function positionSegThumb(segEl, btn){
+      if(!segEl || !btn) return;
+      var thumb = segEl.querySelector('.seg__thumb');
+      if(!thumb) return;
+      var sr = segEl.getBoundingClientRect();
+      var br = btn.getBoundingClientRect();
+      if(!br.width) return;
+      var cs = window.getComputedStyle(segEl);
+      var bl = parseFloat(cs.borderLeftWidth) || 0;
+      var x = br.left - (sr.left + bl);
+      if(!segThumbReady){ thumb.style.transition = 'none'; }
+      thumb.style.width = br.width + 'px';
+      thumb.style.transform = 'translateX(' + x + 'px)';
+      if(!segThumbReady){
+        void thumb.offsetWidth;
+        thumb.style.transition = '';
+        segThumbReady = true;
+      }
+    }
+
+    function activateSegmentUI(segKey){
+      var segEl = document.querySelector('.seg[data-others]');
+      if(!segEl) return;
+      var btns = segEl.querySelectorAll('.seg__btn'), activeBtn = null;
+      for(var i=0;i<btns.length;i++){
+        var on = btns[i].getAttribute('data-seg') === segKey;
+        btns[i].classList.toggle('seg__btn--active', on);
+        btns[i].setAttribute('aria-selected', on ? 'true' : 'false');
+        if(on) activeBtn = btns[i];
+      }
+      positionSegThumb(segEl, activeBtn);
+      var subEl = document.getElementById('others-sub');
+      if(subEl && TABS[segKey]) subEl.textContent = TABS[segKey].sub;
+    }
+
+    function selectSegment(segKey){
+      if(!segKey) return;
+      othersActive = segKey;
+      activateSegmentUI(segKey);
+      reload(segKey);
+    }
+
+    function switchTab(key){
+      var views = document.querySelectorAll('.view');
+      for(var i=0;i<views.length;i++){
+        views[i].classList.toggle('active', views[i].getAttribute('data-view')===key);
+      }
+      var items = document.querySelectorAll('.nav__item');
+      for(var j=0;j<items.length;j++){
+        var on = items[j].getAttribute('data-tab')===key;
+        items[j].classList.toggle('nav__item--active', on);
+        if(on) items[j].setAttribute('aria-current','page'); else items[j].removeAttribute('aria-current');
+      }
+      window.scrollTo(0,0);
+      if(key === 'others'){
+        activateSegmentUI(othersActive);
+        reload(othersActive);
+      } else {
+        reload(key);
+      }
+    }
+
+    var navItems = document.querySelectorAll('.nav__item');
+    for(var n=0;n<navItems.length;n++){
+      navItems[n].addEventListener('click', function(){ switchTab(this.getAttribute('data-tab')); });
+    }
+
+    (function(){
+      var segEl = document.querySelector('.seg[data-others]');
+      if(!segEl) return;
+      segEl.addEventListener('click', function(e){
+        var b = e.target.closest ? e.target.closest('.seg__btn') : null;
+        if(!b) return;
+        var segKey = b.getAttribute('data-seg');
+        if(!segKey || segKey === othersActive) return;
+        selectSegment(segKey);
+      });
+    })();
+
+    window.addEventListener('resize', function(){
+      var active = document.querySelector('.view.active');
+      if(!active || active.getAttribute('data-view') !== 'others') return;
+      var segEl = document.querySelector('.seg[data-others]');
+      var activeBtn = segEl ? segEl.querySelector('.seg__btn--active') : null;
+      positionSegThumb(segEl, activeBtn);
+    });
+
+    document.addEventListener('click', function(e){
+      var btn = e.target.closest ? e.target.closest('.retry') : null;
+      if(btn){ reload(btn.getAttribute('data-retry'), true); }
+    });
+
+    function launchInstall(link){
+      if(!link) return;
+      window.open(link);
+    }
+    document.addEventListener('click', function(e){
+      var g = e.target.closest ? e.target.closest('[data-install]') : null;
+      if(!g) return;
+      e.preventDefault();
+      launchInstall(g.getAttribute('data-install'));
+    });
+
+    document.addEventListener('visibilitychange', function(){
+      if(document.visibilityState === 'visible'){
+        var active = document.querySelector('.view.active');
+        if(!active) return;
+        var v = active.getAttribute('data-view');
+        var key = (v === 'others') ? othersActive : v;
+        if(key) reload(key, true);
+      }
+    });
+  </script>
+</body>
+</html>
